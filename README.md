@@ -1,93 +1,67 @@
-# Tugas Algoritma Komputasi: Jaringan Saraf Tiruan dengan *Back Propagation*
+# Jaringan Saraf Tiruan *Back Propagation* untuk Mengenali Kendaraan
 
-Repositori ini berisi tugas mata kuliah Algoritma Komputasi, yaitu jaringan saraf tiruan *multilayer* yang dilatih dengan algoritma *back propagation* untuk mengenali 3 kelas objek dari citra *grayscale*. Algoritma ditulis manual per langkah dengan NumPy, mengikuti notasi variabel pada buku acuan.
+**Nama:** Muhammad Alif Qadri
+**NIM:** D082261018
+**Mata kuliah:** Algoritma Komputasi
 
-## Ringkasan
+Jaringan saraf tiruan *multilayer* yang dilatih dengan *back propagation* untuk mengenali tiga kelas kendaraan dari citra *grayscale*: pesawat, mobil, dan kapal. Algoritma ditulis manual per langkah dengan NumPy mengikuti Fausett, *Fundamentals of Neural Networks*, Bab 6 (Langkah 0 sampai 9 dan *Application procedure*), dengan notasi variabel yang sama dengan buku.
 
-| Aspek | Keterangan |
-|-------|------------|
-| Objek | Kendaraan |
-| Kelas | Objek 1 = pesawat (*airplane*), Objek 2 = mobil (*automobile*), Objek 3 = kapal (*ship*) |
-| Citra | 32 x 32 *pixel*, diubah ke *grayscale*, sehingga jumlah *node input* n = 1024 |
-| *Hidden layer* | p *node* (jumlah masih ditentukan) |
-| *Output* | Tepat 3 *node* dengan pola target `1 0 0`, `0 1 0`, dan `0 0 1` |
-| Bahasa dan lingkungan | Python (NumPy dan Pillow) pada Google Colab |
-| Buku acuan | Fausett, *Fundamentals of Neural Networks*, Bab 6, Langkah 0 sampai 9 dan *Application procedure* |
+## Rancangan
 
-## Sumber *Dataset*
+| Aspek | Nilai |
+|-------|-------|
+| Kelas | pesawat (`1 0 0`), mobil (`0 1 0`), kapal (`0 0 1`) |
+| *Node input* | n = 1024 (citra 32 x 32 *pixel*, *grayscale*) |
+| *Node hidden* | p = 100 |
+| *Node output* | m = 3 |
+| Laju belajar | 0,1 |
+| Berhenti | galat rata-rata di bawah 0,01 atau 200 *epoch* |
+| Keputusan "dikenali" | nilai *output* terbesar minimal 0,5 |
+| Pustaka | NumPy dan Pillow saja |
 
-*Dataset* berasal dari **CIFAR-10**, *dataset* publik yang dibuat oleh Alex Krizhevsky, Vinod Nair, dan Geoffrey Hinton.
+*Preprocessing* (sama di *training* dan pengujian): ubah ke *grayscale*, ubah ukuran ke 32 x 32 bila perlu, ratakan menjadi vektor 1024, bagi 255.
 
-| Rincian | Keterangan |
-|---------|------------|
-| Halaman resmi | https://www.cs.toronto.edu/~kriz/cifar.html |
-| Arsip yang dipakai | `cifar-10-binary.tar.gz` (versi biner), MD5 `c32a1d4ab5d03f1284b67883e8d87530` menurut halaman resmi |
-| Alasan memakai versi biner | Memuat berkas *pickle* dari internet berisiko menjalankan kode asing |
-| Kelas yang diambil | `airplane`, `automobile`, `ship` |
-| Data latih | 300 gambar per kelas, diambil dari 5 *batch* latih CIFAR-10 |
-| Data uji | 50 gambar per kelas, diambil dari *test set* resmi CIFAR-10 dan tidak ikut dilatih |
-| Pengambilan acak | Memakai *seed* 42 agar dapat diulang |
-| Konversi | Dari format biner menjadi berkas `.png` (RGB, 32 x 32) di Google Colab. Konversi ke *grayscale* dikerjakan pada tahap *preprocessing* di program *training* dan pengujian |
+## Isi Repositori
 
-Sitasi:
+| Berkas atau folder | Fungsi |
+|--------------------|--------|
+| `NOTEBOOK/TRAINING.ipynb` | Melatih jaringan di Google Colab dan menyimpan bobot ke satu berkas `BOBOT.npz` (`v`, `v_0`, `w`, `w_0`, `ukuran`) |
+| `NOTEBOOK/PENGUJIAN.ipynb` | Memilih satu gambar, membaca `BOBOT.npz`, menghitung umpan maju saja, lalu menampilkan dikenali atau tidak |
+| `DETEKSI/DETEKSI.html` | Halaman web satu berkas untuk mencoba model: pilih foto atau salah satu dari 10 contoh dataset uji. Bobot tertanam di halaman, jalan di peramban tanpa *server* |
+| `VISUALISASI/VISUALISASI.html` | Penjelasan interaktif alur *training* dan pengujian dengan jaringan mini 16, 3, 3 (bukan model sebenarnya) |
+| `DATASET/` | 900 gambar latih dan 150 gambar uji (`LATIH` dan `UJI`, per kelas) |
+| `BOBOT/` | Tempat berkas bobot. Berkas `BOBOT.npz` hasil latihan disimpan di Google Drive dan belum ada di repositori ini |
 
-- Krizhevsky, A. (2009). *Learning Multiple Layers of Features from Tiny Images*. Technical Report, University of Toronto.
-- Fausett, L. (1994). *Fundamentals of Neural Networks: Architectures, Algorithms, and Applications*. Prentice Hall.
+## *Dataset*
 
-Hak atas gambar dan ketentuan penggunaan *dataset* mengikuti halaman resmi CIFAR-10 di atas.
+Berasal dari **CIFAR-10** (Krizhevsky, 2009), versi biner dari https://www.cs.toronto.edu/~kriz/cifar.html (MD5 `c32a1d4ab5d03f1284b67883e8d87530` menurut halaman resmi). Kelas yang diambil: `airplane`, `automobile`, `ship`.
 
-## Isi *Dataset* di Repositori Ini
+- Data latih: 300 gambar per kelas dari 5 *batch* latih.
+- Data uji: 50 gambar per kelas dari *test set* resmi, tidak ikut dilatih.
+- Pengambilan acak dengan *seed* 42. Gambar disimpan sebagai `.png` RGB 32 x 32.
+- Diperiksa pada berkas di repositori: 1.050 gambar, semuanya 32 x 32 RGB, tidak ada duplikat (SHA-256), termasuk antara data latih dan uji.
 
-Sudah diperiksa pada berkas yang ada di repositori:
+Ketentuan penggunaan gambar mengikuti halaman resmi CIFAR-10.
 
-| Pemeriksaan | Hasil |
-|-------------|-------|
-| Total gambar | 1.050 berkas `.png` (900 latih dan 150 uji) |
-| Ukuran gambar | Seluruhnya 32 x 32 *pixel* |
-| Mode warna | Seluruhnya RGB |
-| Duplikat berkas (berdasarkan SHA-256) | Tidak ada, termasuk antara data latih dan data uji |
-| Ukuran total folder `DATASET` | Sekitar 4,2 MB |
+## Hasil
 
-## Struktur Folder
+Bobot dari Drive diuji pada 150 gambar uji (hitungan NumPy, dicocokkan dengan `DETEKSI.html`):
 
-Nama folder dan berkas memakai huruf besar dengan garis bawah sebagai pengganti spasi. Ekstensi berkas tetap huruf kecil.
+| Kelas | Tebakan benar | Dikenali benar (nilai ≥ 0,5) |
+|-------|---------------|------------------------------|
+| Pesawat | 33 dari 50 | 30 dari 50 |
+| Mobil | 31 dari 50 | 24 dari 50 |
+| Kapal | 27 dari 50 | 26 dari 50 |
+| Total | 91 dari 150 (60,7%) | 80 dari 150 (53,3%) |
 
-```
-.
-├── BOBOT/                        (hasil training: V, v_0, W, w_0 dalam 1 berkas)
-├── DATASET/
-│   ├── LATIH/
-│   │   ├── KELAS1_PESAWAT/       (IMG001.png sampai IMG300.png)
-│   │   ├── KELAS2_MOBIL/         (IMG001.png sampai IMG300.png)
-│   │   └── KELAS3_KAPAL/         (IMG001.png sampai IMG300.png)
-│   └── UJI/
-│       ├── KELAS1_PESAWAT/       (IMG001.png sampai IMG050.png)
-│       ├── KELAS2_MOBIL/         (IMG001.png sampai IMG050.png)
-│       └── KELAS3_KAPAL/         (IMG001.png sampai IMG050.png)
-├── DOKUMEN/
-└── NOTEBOOK/                     (TRAINING.ipynb dan PENGUJIAN.ipynb)
-```
-
-## *Preprocessing*
-
-Langkah yang sama dipakai pada program *training* dan program pengujian:
-
-1. Ubah ke *grayscale*.
-2. Ubah ukuran ke 32 x 32 *pixel* (hanya sebagai pengaman, karena gambar sudah seragam).
-3. Ratakan (*flatten*) menjadi vektor berukuran n = 1024.
-4. Normalisasi nilai *pixel* ke rentang 0 sampai 1 dengan membagi 255.
-
-## Status Pengerjaan
-
-| Berkas | Status |
-|--------|--------|
-| `DATASET/` | Sudah ada |
-| `NOTEBOOK/TRAINING.ipynb` | Belum dibuat |
-| `NOTEBOOK/PENGUJIAN.ipynb` | Belum dibuat |
-| `BOBOT/` (berkas bobot) | Belum ada, dihasilkan setelah *training* |
+Artinya sekitar 4 dari 10 gambar uji salah atau tidak dikenali. Hal ini wajar untuk jaringan satu lapisan tersembunyi pada citra abu-abu beresolusi 32 x 32.
 
 ## Catatan
 
-- Resolusi CIFAR-10 sangat rendah (32 x 32), sehingga detail objek terbatas.
-- Pesawat dan kapal sama-sama sering berlatar biru, sehingga kedua kelas ini mungkin sulit dibedakan oleh jaringan sederhana. Ini baru perkiraan dan belum diuji. Akurasi akan dilaporkan setelah *training* dan pengujian selesai.
+- Foto dengan bagian transparan atau resolusi jauh di atas 32 x 32 dapat memberi hasil yang kurang baik, karena model hanya dilatih pada citra CIFAR-10.
 - Pembaruan bobot dilakukan per pola latih sesuai buku, sehingga waktu *training* bertambah seiring jumlah gambar.
+
+## Sitasi
+
+- Krizhevsky, A. (2009). *Learning Multiple Layers of Features from Tiny Images*. Technical Report, University of Toronto.
+- Fausett, L. (1994). *Fundamentals of Neural Networks: Architectures, Algorithms, and Applications*. Prentice Hall.
