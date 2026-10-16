@@ -32,7 +32,6 @@ Jaringan saraf tiruan *multilayer* yang dilatih dengan *back propagation* untuk 
 | `DETEKSI/DETEKSI.html` | Halaman web satu berkas untuk mencoba model: pilih foto atau salah satu dari 10 contoh dataset uji. Bobot tertanam di halaman, jalan di peramban tanpa *server* |
 | `VISUALISASI/VISUALISASI.html` | Penjelasan interaktif alur *training* dan pengujian dengan jaringan mini 16, 3, 3 (bukan model sebenarnya) |
 | `DATASET/` | 900 gambar latih dan 150 gambar uji (`LATIH` dan `UJI`, per kelas) |
-| `HASIL/` (di Drive) | Dibuat otomatis oleh sel terakhir kedua *notebook*: `HASIL/TRAINING` (log, riwayat *epoch* CSV, grafik, *confusion matrix*, tebakan uji CSV) dan `HASIL/PENGUJIAN` (log, gambar hasil, salinan gambar uji, `RIWAYAT_PENGUJIAN.csv`). Dipakai sebagai bahan laporan |
 | `BOBOT/` | Tempat berkas bobot. Berkas `BOBOT.npz` hasil latihan disimpan di Google Drive dan belum ada di repositori ini |
 
 ## *Dataset*
