@@ -1,5 +1,7 @@
 # Jaringan Saraf Tiruan *Back Propagation* untuk Mengenali Kendaraan
 
+Pengenalan 3 kelas, yaitu pesawat, mobil, dan kapal. Ketiganya termasuk kelas kendaraan.
+
 **Nama:** Muhammad Alif Qadri
 **NIM:** D082261018
 **Mata kuliah:** Algoritma Komputasi
