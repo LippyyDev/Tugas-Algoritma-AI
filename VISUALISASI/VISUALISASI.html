@@ -278,7 +278,7 @@ body.nav-off .shell{grid-template-columns:minmax(0,1fr)}
     <section class="hero" id="mulai">
       <h1>Cara jaringan belajar mengenali gambar</h1>
       <p class="heroP">Dua bagian: <b>Training</b> (belajar) lalu <b>Pengujian</b> (menebak gambar baru). Tiap kotak = satu sel <i>notebook</i>. Tekan <b>Berikutnya</b> untuk melihat langkahnya.</p>
-      <p class="heroP"><b>Catatan:</b> bagian <b>Training</b> memakai <b>model demo kecil</b> (gambar 4 × 4, 3 <i>node hidden</i>) supaya aliran angkanya bisa dilihat, kecuali <b>Sel 5</b> yang menggambar jaringan asli (1024 <i>node input</i>, 100 <i>node hidden</i>, 3 <i>node output</i>) dengan bobot awal acak. Bagian <b>Pengujian</b> memakai <b>bobot asli</b> hasil <i>training</i> (<code>BOBOT.npz</code>: 1024 <i>node input</i>, 100 <i>node hidden</i>, 3 <i>node output</i>) yang sudah tertanam di halaman ini, dengan 10 gambar contoh dari dataset uji.</p>
+      <p class="heroP"><b>Catatan:</b> bagian <b>Training</b> memakai <b>model demo kecil</b> (gambar 4 × 4, 3 <i>node hidden</i>) supaya aliran angkanya bisa dilihat, kecuali <b>Sel 5</b> yang menggambar jaringan asli (1024 <i>node input</i>, 100 <i>node hidden</i>, 3 <i>node output</i>) dengan bobot hasil <i>training</i> (<code>BOBOT.npz</code> tertanam) dan satu koreksi tambahan. Bagian <b>Pengujian</b> memakai <b>bobot asli</b> hasil <i>training</i> (<code>BOBOT.npz</code>: 1024 <i>node input</i>, 100 <i>node hidden</i>, 3 <i>node output</i>) yang sudah tertanam di halaman ini, dengan 10 gambar contoh dari dataset uji.</p>
     </section>
     <section class="group" id="g1"><div class="ghead"><span>BAGIAN 1</span><h2>Training</h2></div></section>
     <section class="group" id="g2"><div class="ghead"><span>BAGIAN 2</span><h2>Pengujian</h2></div></section>
@@ -637,26 +637,26 @@ addT({id:'t4',tag:'SEL 4',title:'Fungsi f dan bobot awal',ms:3000,
  show(ctx,i,prev,o){panelSet(ctx.P,[i]);if(ctx.tw)ctx.tw.cancel();if(i===0){const a=ctx.xv;ctx.tw=tween(o.instant?0:2600,e=>{ctx.xv=-5+e*10;ctx.mv()})}else{ctx.xv=0;ctx.mv()}}});
 
 /* SEL 5: jaringan asli 1024, 100, 3 dengan bobot awal acak (alpha sama dengan notebook) */
-const REAL={ready:false,x:[],src:[],idx:[0,2,4]};   // satu contoh tiap kelas, diambil dari CONTOH
+const REAL={ready:false,x:[],src:[],M:null,idx:[1,3,4]};   // satu contoh tiap kelas dari CONTOH, semuanya ditebak benar oleh BOBOT.npz
 const REAL_ALPHA=0.1;
-async function muatContohT5(){try{for(let c=0;c<3;c++){const g=await contohImg(REAL.idx[c]),cv=document.createElement('canvas');cv.width=g.w;cv.height=g.h;const cx=cv.getContext('2d',{willReadFrequently:true});cx.drawImage(g.src,0,0);
+async function muatContohT5(){try{REAL.M=await ambilTertanam();for(let c=0;c<3;c++){const g=await contohImg(REAL.idx[c]),cv=document.createElement('canvas');cv.width=g.w;cv.height=g.h;const cx=cv.getContext('2d',{willReadFrequently:true});cx.drawImage(g.src,0,0);
    const d=cx.getImageData(0,0,g.w,g.h).data,x=new Float64Array(g.w*g.h);for(let i=0;i<x.length;i++)x[i]=gray8(d[i*4],d[i*4+1],d[i*4+2])/255;REAL.x[c]=x;REAL.src[c]=g.src}
   REAL.ready=true;cells.t5&&cells.t5.rebuild()}catch(e){toast('Contoh gambar Sel 5 gagal dimuat: '+e.message)}}
 const walkRC={};
 function walkReal(c){if(walkRC[c])return walkRC[c];const x=REAL.x[c],t=TGT[c],a=REAL_ALPHA;
- if(!walkRC.M0)walkRC.M0=newModel(1024,100,3,mulberry32(42),.5);
- const M0=walkRC.M0,D=detail(M0,x,t,a),M1=cloneM(M0);applyD(M1,D);return walkRC[c]={x,src:REAL.src[c],t,a,M0,M1,D,F1:fwd(M1,x)}}
+
+ const M0=REAL.M,D=detail(M0,x,t,a),M1=cloneM(M0);applyD(M1,D);return walkRC[c]={x,src:REAL.src[c],t,a,M0,M1,D,F1:fwd(M1,x)}}
 const head3=(a,d=3)=>[...a.slice(0,3)].map(v=>f3(v,d)).join(', ');
 addT({id:'t5',tag:'SEL 5',title:'Belajar dari satu gambar (Langkah 3 sampai 9)',ms:3600,
  lead:'Inti program: tebak, bandingkan dengan jawaban, lalu koreksi bobot.',
  steps:()=>{if(!REAL.ready)return[{t:'Memuat contoh gambar',d:'Tunggu sebentar.'}];
   const W=()=>walkReal(cells.t5.ctx.c),nm=()=>KELAS[cells.t5.ctx.c].nama.toLowerCase();return[
-  {t:'1. Masukkan gambar',d:()=>`Gambar ${nm()} diratakan menjadi 1024 angka <code>x</code> (putih = terang). Tiap angka masuk ke satu node input. Bobot masih acak.`},
+  {t:'1. Masukkan gambar',d:()=>`Gambar ${nm()} diratakan menjadi 1024 angka <code>x</code> (putih = terang). Tiap angka masuk ke satu node input. Bobot memakai hasil <i>training</i> (<code>BOBOT.npz</code>).`},
   {t:'2. Hitung node hidden (Langkah 4)',d:'Tiap dari 100 node hidden menjumlahkan x × bobot v (1024 suku), lalu <code>f</code> meremasnya ke 0 sampai 1. Satu garis tipis = satu bobot.',f:()=>{const w=W(),M=w.M0,F=w.D;return`z_in_1 = v_01 + Σ x_i · v_i1\n       = ${f3(M.v0[0])} + (${f3(w.x[0],2)} · ${f3(M.v[0],2)}) + (${f3(w.x[1],2)} · ${f3(M.v[100],2)}) + … (1024 suku)\n       = ${f3(F.z_in[0])}\nz_1 = f(${f3(F.z_in[0])}) = <b>${f3(F.z[0])}</b>`}},
   {t:'3. Hitung node output (Langkah 5)',d:'Sama, dari 100 node hidden ke 3 node output. Hasilnya <code>y</code> adalah tebakan jaringan.',f:()=>{const w=W(),M=w.M0,F=w.D;return`y_in_1 = w_01 + Σ z_j · w_j1\n       = ${f3(M.w0[0])} + (${f3(F.z[0],2)} · ${f3(M.w[0],2)}) + (${f3(F.z[1],2)} · ${f3(M.w[3],2)}) + (${f3(F.z[2],2)} · ${f3(M.w[6],2)}) + … (100 suku)\n       = ${f3(F.y_in[0])}\ny_1 = f(${f3(F.y_in[0])}) = <b>${f3(F.y[0])}</b>`}},
   {t:'4. Bandingkan dengan target (Langkah 6)',d:()=>`Jawaban yang benar <code>t</code> = ${TGT[cells.t5.ctx.c].join(' ')}. Selisih tebakan dan jawaban disebut galat. Faktor koreksinya <code>δ</code> muncul di tiap output (angka merah muda).`,f:()=>{const w=W();return`t = (${w.t.join(', ')})\ny = (${[...w.D.y].map(a=>f3(a,2)).join(', ')})\nδ_k = (t_k − y_k) · f'(y_in_k) = (${[...w.D.delta_k].map(a=>f3(a,3)).join(', ')})`}},
   {t:'5. Galat dikirim mundur (Langkah 7)',d:'Tiap node hidden ikut bertanggung jawab. Galat output dibagi ke 100 node hidden lewat bobot w, lalu ke 1024 × 100 bobot v. Cincin merah muda = node hidden yang perlu dikoreksi.',f:()=>{const w=W();return`δ_j = (Σ δ_k · w_jk) · f'(z_in_j)\nδ_1, δ_2, δ_3 = (${head3(w.D.delta_j,4)}) … (100 nilai)`}},
-  {t:'6. Bobot dikoreksi (Langkah 8)',d:'Setiap bobot digeser sedikit agar galat mengecil. Garis kini memakai bobot baru.',f:()=>{const w=W();return`w_11(baru) = w_11(lama) + α · δ_1 · z_1\n           = ${f3(w.M0.w[0])} + ${f3(w.D.delta_w[0])} = <b>${f3(w.M1.w[0])}</b>   (α = learning rate = ${f3(w.a,2)})`}},
+  {t:'6. Bobot dikoreksi (Langkah 8)',d:'Setiap bobot digeser sedikit agar galat mengecil. Garis kini memakai bobot baru. Jaringan ini sudah terlatih, jadi ini koreksi tambahan; <i>training</i> sungguhan mulai dari bobot acak.',f:()=>{const w=W();return`w_11(baru) = w_11(lama) + α · δ_1 · z_1\n           = ${f3(w.M0.w[0])} + ${f3(w.D.delta_w[0])} = <b>${f3(w.M1.w[0])}</b>   (α = learning rate = ${f3(w.a,2)})`}},
   {t:'7. Coba lagi dengan bobot baru',d:'Tebakan sedikit lebih dekat ke jawaban. Pekerjaan ini diulang untuk semua gambar, berkali-kali (Sel 6).',f:()=>{const w=W();return`y sebelum = (${[...w.D.y].map(a=>f3(a,3)).join(', ')})\ny sesudah = (${[...w.F1.y].map(a=>f3(a,3)).join(', ')})\ntarget    = (${w.t.join(', ')})`}}]},
  build(stage,cell){const ctx={c:0};if(!REAL.ready){stage.appendChild(h('p',{class:'sub'},'Memuat contoh gambar...'));return ctx}
   ctx.net=new NetBig(stage);stage.insertBefore(clsSeg(ctx,cell),stage.firstChild);return ctx},
