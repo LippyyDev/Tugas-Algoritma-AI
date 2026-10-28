@@ -54,17 +54,26 @@ Nilai awal (Step 0): `rng = np.random.default_rng(BIJI_ACAK)` membuat pembangkit
 
 ## 5. Faktor Koreksi Galat (Step 6 dan 7)
 
-| Simbol | Arti | Jumlah nilai |
-|--------|------|--------------|
-| `delta_k` | Faktor koreksi galat *node output* k: `(t_k - y_k) f'(y_in_k)` | 3 |
-| `delta_in_j` | Jumlah `delta_k` yang dikirim mundur ke *node hidden* j: `SUM_k delta_k w_jk` | 100 |
-| `delta_j` | Faktor koreksi galat *node hidden* j: `delta_in_j f'(z_in_j)` | 100 |
-| `Δw_jk` | Selisih koreksi bobot W: `alpha delta_k z_j` | 300 |
-| `Δw_0k` | Selisih koreksi *bias* W: `alpha delta_k` | 3 |
-| `Δv_ij` | Selisih koreksi bobot V: `alpha delta_j x_i` | 102.400 |
-| `Δv_0j` | Selisih koreksi *bias* V: `alpha delta_j` | 100 |
+Ada dua huruf Yunani yang mirip, tetapi artinya berbeda:
 
-Jumlah koreksi selalu sama dengan jumlah bobot yang dikoreksi.
+* **δ** (delta **kecil**, bentuk seperti bawang) adalah **faktor koreksi galat** milik satu *node*.
+* **Δ** (delta **besar**, bentuk segitiga) adalah **besar perubahan bobot** yang akan ditambahkan pada bobot.
+
+Hubungannya: `Δw_jk = α δ_k z_j`. Faktor koreksi galat δ dikalikan `α` dan `z_j` untuk menjadi besar perubahan bobot Δ.
+
+| Simbol buku | Nama di kode | Arti | Jumlah nilai |
+|-------------|--------------|------|--------------|
+| `δ_k` (kecil) | `delta_k` | Faktor koreksi galat *node output* k: `(t_k - y_k) f'(y_in_k)` | 3 |
+| `δ_in_j` (kecil) | `delta_in_j` | Jumlah `δ_k` yang dikirim mundur ke *node hidden* j: `SUM_k δ_k w_jk` | 100 |
+| `δ_j` (kecil) | `delta_j` | Faktor koreksi galat *node hidden* j: `δ_in_j f'(z_in_j)` | 100 |
+| `Δw_jk` (besar) | `delta_w` | Besar perubahan bobot W: `α δ_k z_j` | 300 |
+| `Δw_0k` (besar) | `delta_w_0` | Besar perubahan *bias* W: `α δ_k` | 3 |
+| `Δv_ij` (besar) | `delta_v` | Besar perubahan bobot V: `α δ_j x_i` | 102.400 |
+| `Δv_0j` (besar) | `delta_v_0` | Besar perubahan *bias* V: `α δ_j` | 100 |
+
+Di kode, δ dan Δ sama-sama dinamai `delta` karena nama variabel Python tidak bisa memakai simbol Yunani. Yang membedakan adalah akhiran namanya: `delta_k`, `delta_in_j`, `delta_j` adalah δ, sedangkan `delta_w`, `delta_w_0`, `delta_v`, `delta_v_0` adalah Δ.
+
+Jumlah perubahan selalu sama dengan jumlah bobot yang diubah.
 
 ## 6. Parameter Pembelajaran
 
