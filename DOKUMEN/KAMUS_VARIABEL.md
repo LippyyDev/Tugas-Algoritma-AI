@@ -26,17 +26,21 @@ Di buku indeks mulai dari 1. Di Python mulai dari 0, jadi `v_11` di buku adalah 
 
 ## 3. *Node* dan Sinyal
 
-| Simbol | Arti | Jumlah nilai |
-|--------|------|--------------|
-| `X_i` | *Node input* ke-i | 1024 *node* |
-| `x_i` | Nilai *input* ke-i: nilai *pixel grayscale* dibagi 255, sehingga 0 sampai 1 | 1024 nilai |
-| `Z_j` | *Node hidden* ke-j | 100 *node* |
-| `z_in_j` | Masukan bersih *node hidden* j: `v_0j + SUM_i x_i v_ij` | 100 nilai |
-| `z_j` | Keluaran *node hidden* j: `f(z_in_j)` | 100 nilai |
-| `Y_k` | *Node output* ke-k | 3 *node* |
-| `y_in_k` | Masukan bersih *node output* k: `w_0k + SUM_j z_j w_jk` | 3 nilai |
-| `y_k` | Keluaran *node output* k: `f(y_in_k)`, jawaban jaringan | 3 nilai |
-| `t_k` | Target ke-k, kunci jawaban | 3 nilai |
+Huruf besar (`X_i`, `Z_j`, `Y_k`) adalah *node*-nya. Huruf kecil (`x_i`, `z_j`, `y_k`) adalah nilai atau sinyal yang keluar dari *node* itu. Di tiap lapisan ada dua nilai: masukan bersih (`z_in_j`, `y_in_k`, hasil penjumlahan) dan keluaran (`z_j`, `y_k`, hasil sigmoid dari masukan bersih).
+
+| Simbol buku | Nama di kode | Arti | Jumlah nilai |
+|-------------|--------------|------|--------------|
+| `X_i` | (indeks i) | *Node input* ke-i | 1024 *node* |
+| `x_i` | `x` | Nilai *input* ke-i: nilai *pixel grayscale* dibagi 255, sehingga 0 sampai 1 | 1024 nilai |
+| `Z_j` | (indeks j) | *Node hidden* ke-j | 100 *node* |
+| `z_in_j` | `z_in` | Masukan bersih *node hidden* j (hasil jumlah, belum keluaran): `v_0j + SUM_i x_i v_ij` | 100 nilai |
+| `z_j` | `z` | **Keluaran** *node hidden* j, dikirim ke *node output*: `f(z_in_j)`, selalu 0 sampai 1 | 100 nilai |
+| `Y_k` | (indeks k) | *Node output* ke-k | 3 *node* |
+| `y_in_k` | `y_in` | Masukan bersih *node output* k (hasil jumlah): `w_0k + SUM_j z_j w_jk` | 3 nilai |
+| `y_k` | `y` | **Keluaran** *node output* k: `f(y_in_k)`, jawaban jaringan | 3 nilai |
+| `t_k` | `t` | Target ke-k, kunci jawaban | 3 nilai |
+
+Alur satu *node hidden*: `x` dijumlahkan menjadi `z_in`, lalu sigmoid mengubahnya menjadi `z`.
 
 Pola target: pesawat `1 0 0`, mobil `0 1 0`, kapal `0 0 1`. Jadi `Y1` untuk pesawat, `Y2` untuk mobil, `Y3` untuk kapal. Kelas tebakan adalah *node output* dengan nilai terbesar.
 
